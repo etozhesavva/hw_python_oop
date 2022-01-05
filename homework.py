@@ -70,7 +70,7 @@ class Running(Training):
     def get_spent_calories(self) -> float:
         return (
                 ((self.SPEED_MULTIPLIER * self.get_mean_speed())
-                 - self.SPEED_SHIFT) * self.weight / self.M_IN_KM
+                - self.SPEED_SHIFT) * self.weight / self.M_IN_KM
                 * self.duration * self.MIN_IN_H
         )
 
@@ -86,8 +86,8 @@ class SportsWalking(Training):
     def get_spent_calories(self) -> float:
         return (
                 ((self.WEIGHT_MULTIPLIER * self.weight)
-                 + ((self.get_mean_speed() ** 2 // self.height)
-                    * self.WEIGHT_FACTOR * self.weight))
+                + ((self.get_mean_speed() ** 2 // self.height)
+                * self.WEIGHT_FACTOR * self.weight))
                 * self.duration * self.MIN_IN_H
         )
 
@@ -105,21 +105,21 @@ class Swimming(Training):
     def get_mean_speed(self) -> float:
         """Средняя скорость."""
         return (
-                self.length_pool * self.count_pool
-                / self.M_IN_KM / self.duration
+            self.length_pool * self.count_pool
+            / self.M_IN_KM / self.duration
         )
 
     def get_spent_calories(self) -> float:
         """Спаленные калории"""
         return (
-                (self.get_mean_speed() + self.SPEED_MULTIPLIER)
-                * self.SPEED_SHIFT * self.weight
+            (self.get_mean_speed() + self.SPEED_MULTIPLIER)
+            * self.SPEED_SHIFT * self.weight
         )
 
 
 TRAINING_TYPE = {'SWM': Swimming, 'RUN': Running, 'WLK': SportsWalking}
 TYPE_ERROR = 'Данная тренировка не найдена {}'
-PARAMETER_ERROR = 'Для тренировки {} необходимо {} показателей. Было получено {}'
+PARAMETER_ERROR = 'Тренировка {} ожидает {} показателей. Было получено {}'
 
 
 def read_package(workout_type: str, data: list) -> Training:
@@ -129,7 +129,7 @@ def read_package(workout_type: str, data: list) -> Training:
     training_type = TRAINING_TYPE[workout_type]
     if len(data) != len(fields(training_type)):
         raise ValueError(PARAMETER_ERROR.format(workout_type,
-                                                len(fields(training_type)), len(data)))
+                         len(fields(training_type)), len(data)))
     return training_type(*data)
 
 
