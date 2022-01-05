@@ -20,10 +20,8 @@ class InfoMessage:
 
     def get_message(self) -> str:
         return self.MESSAGE.format(
-            self.training_type,
-            self.duration,
-            self.distance,
-            self.speed,
+            self.training_type, self.duration,
+            self.distance, self.speed,
             self.calories
         )
 
@@ -35,9 +33,9 @@ class Training:
     duration: float
     weight: float
 
-    M_IN_KM: ClassVar[int] = 1000
     LEN_STEP: ClassVar[float] = 0.65
-    MIN_IN_H: ClassVar[int] = 60
+    M_IN_KM: ClassVar[int] = 1000
+    MIN_IN_HOUR: ClassVar[int] = 60
 
     def get_distance(self) -> float:
         """Получить дистанцию в км."""
@@ -49,7 +47,7 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        raise
+        pass
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -69,38 +67,36 @@ class Running(Training):
 
     def get_spent_calories(self) -> float:
         return (
-                ((self.SPEED_MULTIPLIER * self.get_mean_speed())
-                 - self.SPEED_SHIFT) * self.weight / self.M_IN_KM
-                * self.duration * self.MIN_IN_H
+            ((self.SPEED_MULTIPLIER * self.get_mean_speed())
+             - self.SPEED_SHIFT) * self.weight / self.M_IN_KM
+             * self.duration * self.MIN_IN_HOUR
         )
 
 
 @dataclass
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
+    WIGHT_MULTIPLIER_1: ClassVar[float] = 0.035
+    WIGHT_MULTIPLIER_2: ClassVar[float] = 0.029
     height: float
-
-    WEIGHT_MULTIPLIER: ClassVar[float] = 0.035
-    WEIGHT_FACTOR: ClassVar[float] = 0.029
 
     def get_spent_calories(self) -> float:
         return (
-                ((self.WEIGHT_MULTIPLIER * self.weight)
+                ((self.WIGHT_MULTIPLIER_1 * self.weight)
                  + ((self.get_mean_speed() ** 2 // self.height)
-                    * self.WEIGHT_FACTOR * self.weight))
-                * self.duration * self.MIN_IN_H
+                 * self.WIGHT_MULTIPLIER_2 * self.weight))
+                 * self.duration * self.MIN_IN_HOUR
         )
 
 
 @dataclass
 class Swimming(Training):
     """Тренировка: плавание."""
-    length_pool: float
-    count_pool: int
-
-    LEN_STEP: ClassVar[float] = 1.38
     SPEED_MULTIPLIER: ClassVar[float] = 1.1
     SPEED_SHIFT: ClassVar[float] = 2
+    LEN_STEP: ClassVar[float] = 1.38
+    length_pool: float
+    count_pool: int
 
     def get_mean_speed(self) -> float:
         """Средняя скорость."""
@@ -117,16 +113,16 @@ class Swimming(Training):
         )
 
 
-TRAINING_TYPE = {'SWM': Swimming, 'RUN': Running, 'WLK': SportsWalking}
-TYPE_ERROR = 'Данная тренировка не найдена {}'
-PARAMETER_ERROR = 'Для тренировки {} необходимо {} показателей. Было получено {}'
+TRAINING_TYPES = {'SWM': Swimming, 'RUN': Running, 'WLK': SportsWalking}
+TRAINING_ERROR = 'Нет такой тренировки {}'
+PARAMETER_ERROR = 'Для тренировки {} ожадалось {} показателей, а не {}'
 
 
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
-    if workout_type not in TRAINING_TYPE:
-        raise ValueError(TYPE_ERROR.format(workout_type))
-    training_type = TRAINING_TYPE[workout_type]
+    if workout_type not in TRAINING_TYPES:
+        raise ValueError(TRAINING_ERROR.format(workout_type))
+    training_type = TRAINING_TYPES[workout_type]
     if len(data) != len(fields(training_type)):
         raise ValueError(PARAMETER_ERROR.format(workout_type,
                                                 len(fields(training_type)), len(data)))
@@ -142,7 +138,7 @@ if __name__ == '__main__':
     packages = [
         ('SWM', [720, 1, 80, 25, 40]),
         ('RUN', [15000, 1, 75]),
-        ('WLK', [9000, 1, 75, 180]),
+        ('WLK', [9000, 1, 75, 180])
     ]
 
     for workout_type, data in packages:
