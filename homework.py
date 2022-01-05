@@ -123,7 +123,7 @@ def read_package(workout_type: str, data: list) -> Training:
     training_type = S_TYPE[workout_type]
     if len(data) != len(fields(training_type)):
         raise ValueError(PRM_ERROR.format(workout_type,
-                                                len(fields(training_type)), len(data)))
+                         len(fields(training_type)), len(data)))
     return training_type(*data)
 
 
